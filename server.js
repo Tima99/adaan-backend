@@ -16,16 +16,17 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(
-  cors({
-    credentials: true,
-    origin: `${process.env.CLIENT_URL}`,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  })
-);
-
 app.use(express.static(path.join(__dirname, "/uploads")));
 app.use("/api/auth", authRoutes);
+
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: `*`,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+//   })
+// );
+
 app.use(errorHandler);
 
 //database connection

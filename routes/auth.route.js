@@ -10,6 +10,8 @@ import { validateReq } from "../middleware/validate.js";
 import { imageUpload } from "../middleware/upload.middleware.js";
 import { validateEmail, validatePassword } from "../utils/custom-validator.js";
 
+router.post("/login", login);
+
 router.post("/register", [validateEmail("@email")], validateReq, register);
 
 // creating password with after otp
@@ -18,7 +20,6 @@ router.post(
   verifyEmail
 );
 
-router.post("/login", [validateEmail("@email")], validateReq, login);
 
 router.post("/logOut", logOut);
 

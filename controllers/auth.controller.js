@@ -109,6 +109,7 @@ export const verifyEmail = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    
     if (!password)
       throw new Error("Password is required", {
         cause: {
@@ -121,7 +122,9 @@ export const login = async (req, res, next) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    if (!bcrypt.compare(password, user.password))
+    const isVerified = await bcrypt.compare(password, user.password)
+    
+    if (!isVerified)
       return res.status(403).json({
         success: false,
         message: "Password Incorrect",

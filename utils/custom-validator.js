@@ -19,7 +19,6 @@ export function validateEmail(key) {
   return check(key)
     .toLowerCase()
     .isEmail()
-
     .withMessage("Invalid Email Address");
 }
 export function validatePassword(key) {
