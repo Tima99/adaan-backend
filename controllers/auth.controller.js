@@ -31,6 +31,7 @@ export const register = async (req, res, next) => {
       email,
       name,
       phone,
+      otp: OTP,
     });
 
     await sendEmail(
@@ -53,38 +54,45 @@ export const register = async (req, res, next) => {
 //verify email
 export const verifyEmail = async (req, res, next) => {
   try {
-    const { token } = req.params;
-    jwt.verify(
-      token,
-      process.env.JWT_ACCOUNT_ACTIVATION,
-      async (err, decoded) => {
-        if (err) {
-          return res
-            .status(400)
-            .json({ message: "Expired link. Signup again" });
-        }
-        const { data } = decoded;
-        const user = await User.findOne({ email: data });
+    const { email } = req.params;
+    const { otp, password } = req.body;
 
-        if (!user) {
-          return res.status(400).json({ message: "User not found" });
-        }
-        user.isVerified = true;
-        await user.save();
-        res.status(200).send(`
-          <html>
-            <head>
-              <title>Account Verified</title>
-            </head>
-            <body>
-              <h1>Your Account Has Been Verified Successfully.</h1>
-              <br/>
-              <a href="${process.env.CLIENT_URL}">Click here to go back to login page</a>
-            </body>
-          </html>
-          `);
-      }
-    );
+    const user = await User.findOne({ email });
+
+    if (!user) throw new Error("User not exists");
+
+    const savedOTP = user.otp;
+
+    if (savedOTP !== Number(otp)) {
+      throw new Error("Invalid OTP", {
+        cause: {
+          status: 400,
+        },
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    user.password = hashedPassword;
+    user.otp = null;
+
+    await user.save();
+
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true, //can't access from client side
+    };
+
+    const accessToken = generateJwtToken({
+      phone: user.phone,
+      email,
+    });
+
+    res.cookie("accessToken", accessToken, options).status(200).json({
+      success: true,
+      user,
+      message: "User logged in successfully",
+    });
   } catch (error) {
     next(error);
   }

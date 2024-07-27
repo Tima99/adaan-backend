@@ -18,13 +18,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       index: 1,
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
     password: {
       type: String,
     },
+    otp: {
+      type: Number,
+      index: 1
+    }
   },
   {
     timestamps: true,

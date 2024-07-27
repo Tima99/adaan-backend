@@ -10,13 +10,13 @@ import { validateReq } from "../middleware/validate.js";
 import { imageUpload } from "../middleware/upload.middleware.js";
 import { validateEmail, validatePassword } from "../utils/custom-validator.js";
 
+router.post("/register", [validateEmail("@email")], validateReq, register);
+
+// creating password with after otp
 router.post(
-  "/register",
-  [validateEmail("@email")],
-  validateReq,
-  register
+  "/verify/:email",
+  verifyEmail
 );
-router.get("/verify/:token", verifyEmail);
 
 router.post("/login", [validateEmail("@email")], validateReq, login);
 
