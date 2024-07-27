@@ -205,7 +205,7 @@ export const loginViaOTP = async (req, res, next) => {
 };
 
 // send email otp
-const sendOtp = async (req, res, next) => {
+export const sendOtp = async (req, res, next) => {
   try {
     const { email } = req.params;
 
