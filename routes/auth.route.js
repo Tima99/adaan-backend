@@ -12,7 +12,7 @@ import { validateReq } from "../middleware/validate.js";
 import { validateEmail } from "../utils/custom-validator.js";
 
 router.post("/login", login);
-router.get("/login/:email/:otp", loginViaOTP);
+router.post("/login/:email", loginViaOTP);
 router.get("/sent/otp/:email", sendOtp);
 
 router.post("/register", [validateEmail("@email")], validateReq, register);
