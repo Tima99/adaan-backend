@@ -5,12 +5,14 @@ import {
   login,
   verifyEmail,
   logOut,
+  loginViaOTP
 } from "../controllers/auth.controller.js";
 import { validateReq } from "../middleware/validate.js";
 import { imageUpload } from "../middleware/upload.middleware.js";
 import { validateEmail, validatePassword } from "../utils/custom-validator.js";
 
 router.post("/login", login);
+router.post("/login/:otp", loginViaOTP);
 
 router.post("/register", [validateEmail("@email")], validateReq, register);
 

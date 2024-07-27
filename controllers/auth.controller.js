@@ -54,7 +54,7 @@ export const register = async (req, res, next) => {
   }
 };
 
-//verify email
+//verify email and create password
 export const verifyEmail = async (req, res, next) => {
   try {
     const { email } = req.params;
@@ -109,7 +109,7 @@ export const verifyEmail = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    
+
     if (!password)
       throw new Error("Password is required", {
         cause: {
@@ -122,8 +122,8 @@ export const login = async (req, res, next) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    const isVerified = await bcrypt.compare(password, user.password)
-    
+    const isVerified = await bcrypt.compare(password, user.password);
+
     if (!isVerified)
       return res.status(403).json({
         success: false,
@@ -152,6 +152,93 @@ export const login = async (req, res, next) => {
     });
   } catch (err) {
     next(err);
+  }
+};
+
+// verify otp and login
+export const loginViaOTP = async (req, res, next) => {
+  try {
+    const { otp } = req.params;
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user)
+      throw new Error("User not found", {
+        cause: {
+          status: 400,
+        },
+      });
+
+    if (user.otp !== Number(otp))
+      throw new Error("Incorrect OTP", {
+        cause: {
+          status: 400,
+        },
+      });
+
+    user.otp = null;
+    await user.save();
+
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true, //can't access from client side
+    };
+
+    const accessToken = generateJwtToken({
+      email,
+      phone: user.phone,
+    });
+
+    const updatedUser = user.toObject();
+    delete updatedUser.otp;
+    delete updatedUser.password;
+
+    res.cookie("accessToken", accessToken, options).status(200).json({
+      success: true,
+      user: updatedUser,
+      message: "User logged in successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// send email otp
+const sendOtp = async (req, res, next) => {
+  try {
+    const { email } = req.params;
+
+    const user = await User.findOne({ email });
+
+    if (!user)
+      throw new Error("User not found", {
+        cause: {
+          status: 400,
+        },
+      });
+
+    const OTP = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+
+    user.otp = OTP;
+    await user.save();
+
+    await sendEmail(
+      email,
+      "The God Father: Email Verification",
+      `Verify your mail With OTP: <b>${OTP}</b>`
+    );
+
+    res.json({
+      message: "Email Otp Sent Successfully",
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
