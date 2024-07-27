@@ -1,5 +1,5 @@
 import express from "express";
-import { createUpdate, updateProfileTab } from "../controllers/profile.controller";
+import { createUpdate, updateProfileTab } from "../controllers/profile.controller.js";
 import { imageUpload } from "../middleware/upload.middleware.js";
 
 const router = express.Router();

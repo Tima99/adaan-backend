@@ -1,11 +1,19 @@
 import multer from "multer";
 import { dirname, join } from "path";
-import fs from "fs";
+import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 
 const __dirname = dirname(dirname(fileURLToPath(import.meta.url)));
-const imagesPath = join(__dirname, "uploads", "images");
+const imagesPath = join(__dirname, "uploads");
+(async () => {
+  try {
+    await fs.readdir(imagesPath);
+  } catch (error) {
+    await fs.mkdir(imagesPath);
+  }
+})();
+
 const ACCEPTED_IMAGE_FORMATS = ["image/jpeg", "image/png", "image/jpg"];
 dotenv.config({
   path: join(__dirname, ".env"),
@@ -35,9 +43,9 @@ function imageFileFilter(req, file, cb) {
 }
 
 const imageUpload = multer({ storage, fileFilter: imageFileFilter });
-imageUpload._delete = (filename) => {
+imageUpload._delete = async (filename) => {
   try {
-    fs.unlinkSync(join(imagesPath, filename));
+    await fs.rm(join(imagesPath, filename));
   } catch (errorDeletingImage) {
     console.log({ errorDeletingImage });
   }

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/user.model";
+import User from "../models/user.model.js";
 
 const isUser = async (req, res, next) => {
   try {
@@ -8,7 +8,7 @@ const isUser = async (req, res, next) => {
     try {
       const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-      const user = await User.findOne({ phone: payload.phone });
+      const user = await User.findOne({ email: payload.email }).lean();
 
       req.user = user;
     } catch (err) {

@@ -1,14 +1,15 @@
+import { imageUpload } from "../middleware/upload.middleware.js";
 import Profile from "../models/profile.model.js";
 
 export const createUpdate = async (req, res, next) => {
   try {
     const { name, removedImage } = req.body;
 
-    const image = req.file?.image;
+    const image = req.file?.filename;
 
     const userId = req.user._id;
 
-    const profile = await Profile.updateOne(
+    const profile = await Profile.findOneAndUpdate(
       { userId },
       {
         basicDetail: {
@@ -21,11 +22,15 @@ export const createUpdate = async (req, res, next) => {
       }
     );
 
+    profile?.basicDetail?.image &&
+      (await imageUpload._delete(profile?.basicDetail?.image));
+
     res.json({
       message: "Profile created/updated",
       profile,
     });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
