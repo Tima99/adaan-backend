@@ -40,9 +40,12 @@ export const register = async (req, res, next) => {
       `Verify your mail With OTP: <b>${OTP}</b>`
     );
 
+    const newUser = data.toObject();
+    delete newUser.otp;
+
     res.status(201).json({
       status: "success",
-      data,
+      newUser,
       message:
         "User registered successfully!! check your mail for verification",
     });
@@ -88,9 +91,13 @@ export const verifyEmail = async (req, res, next) => {
       email,
     });
 
+    const updatedUser = user.toObject();
+    delete updatedUser.otp;
+    delete updatedUser.password;
+
     res.cookie("accessToken", accessToken, options).status(200).json({
       success: true,
-      user,
+      user: updatedUser,
       message: "User logged in successfully",
     });
   } catch (error) {
