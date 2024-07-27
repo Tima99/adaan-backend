@@ -12,7 +12,7 @@ const contactDetailSchema = new mongoose.Schema({
 });
 
 const experienceSchema = new mongoose.Schema({
-  companyName: String,
+  company: String,
   position: String,
   startDate: Date,
   endDate: Date,
@@ -25,7 +25,7 @@ const qualficationSchema = new mongoose.Schema({
   college: String,
   startDate: Date,
   endDate: Date,
-  isCurrentlyStudying: Boolean,
+  cgpa: String,
 });
 
 const profileSchema = new mongoose.Schema(
@@ -38,7 +38,7 @@ const profileSchema = new mongoose.Schema(
     basicDetail: basicDetailSchema,
     contactDetail: contactDetailSchema,
     experiences: [experienceSchema],
-    qualfications: [qualficationSchema],
+    qualifications: [qualficationSchema],
   },
   {
     timestamps: true,
