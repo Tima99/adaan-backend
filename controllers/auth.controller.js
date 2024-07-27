@@ -145,7 +145,7 @@ export const login = async (req, res, next) => {
     delete user.password;
     delete user.otp;
 
-    res.cookie("token", accessToken, options).status(200).json({
+    res.cookie("accessToken", accessToken, options).status(200).json({
       success: true,
       user,
       message: "User logged in successfully",
@@ -158,8 +158,7 @@ export const login = async (req, res, next) => {
 // verify otp and login
 export const loginViaOTP = async (req, res, next) => {
   try {
-    const { otp } = req.params;
-    const { email } = req.body;
+    const { otp, email } = req.params;
 
     const user = await User.findOne({ email });
 

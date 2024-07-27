@@ -13,8 +13,8 @@ import { imageUpload } from "../middleware/upload.middleware.js";
 import { validateEmail, validatePassword } from "../utils/custom-validator.js";
 
 router.post("/login", login);
-router.post("/login/:otp", loginViaOTP);
-router.post("/sent/otp/:email", sendOtp);
+router.get("/login/:email/:otp", loginViaOTP);
+router.get("/sent/otp/:email", sendOtp);
 
 router.post("/register", [validateEmail("@email")], validateReq, register);
 
