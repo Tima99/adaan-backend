@@ -4,18 +4,19 @@ const userSchema = new mongoose.Schema(
     icon: {
       type: String,
     },
-    firstName: {
+    name: {
       type: String,
       required: true,
-      trim: true,
-    },
-    lastName: {
-      type: String,
       trim: true,
     },
     email: {
       type: String,
       required: true,
+    },
+    phone: {
+      type: Number,
+      required: true,
+      index: 1,
     },
     isVerified: {
       type: Boolean,
@@ -23,7 +24,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
     },
   },
   {

@@ -4,38 +4,41 @@ import jwt from "jsonwebtoken";
 import sendEmail from "../utils/mailSender.js";
 import { generateJwtToken } from "../utils/generateJwtToken.js";
 import sendMail from "../utils/mailSender.js";
+import otpGenerator from "otp-generator";
 
 // Register a new user
 export const register = async (req, res, next) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
-    const fileName = req.file?.filename;
-    const user = await User.findOne({ email });
+    const { email, name, phone } = req.body;
+
+    const user = await User.findOne({ $or: [{ email }, { phone }] });
+
     if (user) {
       return res.status(400).json({
         status: "fail",
         message: "User already exists",
       });
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const token = jwt.sign(
-      { data: email },
-      process.env.JWT_ACCOUNT_ACTIVATION,
-      {
-        expiresIn: "10m",
-      }
-    );
+    const OTP = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
 
     const data = await User.create({
       email,
-      password: hashedPassword,
-      icon: fileName,
-      firstName,
-      lastName,
+      name,
+      phone,
     });
 
-    await sendEmail(email, "Verify your mail ", token);
+    await sendEmail(
+      email,
+      "The God Father: Email Verification",
+      `Verify your mail With OTP: <b>${OTP}</b>`
+    );
+
     res.status(201).json({
       status: "success",
       data,

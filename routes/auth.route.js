@@ -9,14 +9,11 @@ import {
 import { validateReq } from "../middleware/validate.js";
 import { imageUpload } from "../middleware/upload.middleware.js";
 import { validateEmail, validatePassword } from "../utils/custom-validator.js";
-import isUser from "../middleware/auth.middleware.js";
 
 router.post(
   "/register",
-  imageUpload.single("icon"),
-  [validateEmail("@email"), validatePassword("@password")],
+  [validateEmail("@email")],
   validateReq,
-
   register
 );
 router.get("/verify/:token", verifyEmail);
