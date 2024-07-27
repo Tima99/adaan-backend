@@ -138,8 +138,9 @@ export const login = async (req, res, next) => {
         const accessToken = generateJwtToken(payload);
 
         const options = {
-            expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-            httpOnly: true,
+            httpOnly: "true",
+            secure: "true", // Set to true if you're using HTTPS
+            sameSite: "None", // Required for cross-origin cookies
         };
 
         delete user.password;

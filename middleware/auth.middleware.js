@@ -3,7 +3,8 @@ import User from "../models/user.model.js";
 
 const isUser = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
+    const token = req.cookies.accessToken;
+
     if (!token) return res.status(401).json({ message: "Unauthorized" });
     try {
       const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
