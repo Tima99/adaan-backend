@@ -50,6 +50,9 @@ export const updateProfileTab = async (req, res, next) => {
         $set: {
           [tabName]: data,
         },
+      },
+      {
+        new: true,
       }
     );
 
