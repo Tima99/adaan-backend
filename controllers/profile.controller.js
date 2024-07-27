@@ -83,3 +83,19 @@ export const readProfileTab = async (req, res, next) => {
         next(error);
     }
 };
+
+export const readProfile = async (req, res, next) => {
+    try {
+        const userId = req.user?._id;
+        
+        const profile = await Profile.findOne({
+            userId,
+        }).lean();
+
+        res.json({
+            data: profile,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
