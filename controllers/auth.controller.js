@@ -109,53 +109,44 @@ export const verifyEmail = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    let user = await User.findOne({ email });
+    if (!password)
+      throw new Error("Password is required", {
+        cause: {
+          status: 400,
+        },
+      });
+
+    let user = await User.findOne({ email }).lean();
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
+
+    if (!bcrypt.compare(password, user.password))
+      return res.status(403).json({
+        success: false,
+        message: "Password Incorrect",
+      });
 
     const payload = {
       email: user?.email,
       id: user?._id,
     };
 
-    if (await bcrypt.compare(password, user.password)) {
-      const accessToken = generateJwtToken(payload);
-      user.password = undefined;
+    const accessToken = generateJwtToken(payload);
 
-      const options = {
-        expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-        httpOnly: true, //can't access from client side
-        // sameSite: "None", //cross site cookies
-      };
+    const options = {
+      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      httpOnly: true,
+    };
 
-      if (!user.isVerified) {
-        const token = jwt.sign(
-          { data: email },
-          process.env.JWT_ACCOUNT_ACTIVATION,
-          {
-            expiresIn: "10m",
-          }
-        );
-        await sendMail(email, "Verify your mail", token);
-        return res.status(400).json({
-          message:
-            "Email verification required!! Check your mail for verification link",
-        });
-      }
+    delete user.password;
+    delete user.otp;
 
-      res.cookie("token", accessToken, options).status(200).json({
-        success: true,
-        accessToken, //remove later
-        user,
-        message: "User logged in successfully",
-      });
-    } else {
-      return res.status(403).json({
-        success: false,
-        message: "Password Incorrect",
-      });
-    }
+    res.cookie("token", accessToken, options).status(200).json({
+      success: true,
+      user,
+      message: "User logged in successfully",
+    });
   } catch (err) {
     next(err);
   }
