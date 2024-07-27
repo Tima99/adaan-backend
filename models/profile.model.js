@@ -33,6 +33,7 @@ const profileSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      index: 1
     },
     basicDetail: basicDetailSchema,
     contactDetail: contactDetailSchema,
