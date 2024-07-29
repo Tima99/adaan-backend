@@ -77,7 +77,7 @@ export const readProfileTab = async (req, res, next) => {
         }).lean();
 
         res.json({
-            data: profile[tabName],
+            data: profile ? profile[tabName] : null,
         });
     } catch (error) {
         next(error);
