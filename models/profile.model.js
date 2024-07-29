@@ -39,6 +39,7 @@ const profileSchema = new mongoose.Schema(
     contactDetail: contactDetailSchema,
     experiences: [experienceSchema],
     qualifications: [qualficationSchema],
+    skills: [String]
   },
   {
     timestamps: true,
