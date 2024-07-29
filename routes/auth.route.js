@@ -20,6 +20,6 @@ router.post("/register", [validateEmail("@email")], validateReq, register);
 // creating password with after otp
 router.post("/verify/:email", verifyEmail);
 
-router.post("/logOut", logOut);
+router.get("/logout", logOut);
 
 export default router;
